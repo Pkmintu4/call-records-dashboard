@@ -1,0 +1,157 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color: #111827;
+  background-color: #f9fafb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.button {
+  border: none;
+  background: #2563eb;
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.card h3 {
+  margin-top: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.92rem;
+}
+
+.table td:nth-child(2) {
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row-button {
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+}
+
+.meta {
+  color: #4b5563;
+  margin: 6px 0;
+  font-size: 0.92rem;
+}
+
+.keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.keyword {
+  background: #eef2ff;
+  color: #3730a3;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+.content-block {
+  white-space: pre-wrap;
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 12px;
+  max-height: 260px;
+  overflow: auto;
+  font-size: 0.88rem;
+}
+
+.error {
+  color: #b91c1c;
+  margin-bottom: 12px;
+}
+
+.status {
+  color: #065f46;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
