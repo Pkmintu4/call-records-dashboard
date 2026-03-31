@@ -45,7 +45,8 @@ def analyze_sentiment(text: str) -> tuple[float, str, str, dict[str, object]]:
 
     prompt = f"""
 You are analyzing a phone call between a Parent and a School Admission Coordinator.
-The transcript may contain Telugu, Hindi, and English mixed. Understand all languages.
+The transcript language is always one of these only: English, Telugu, or (rarely) Hindi.
+Do NOT assume or use any other language.
 Write outputs in simple English only.
 
 For this transcript, extract these KPIs.
@@ -69,7 +70,9 @@ Staff KPIs:
 - politeness_score (1-5)
 - missed_conversion_opportunity (yes/no)
 
-Also provide a short summary in very simple English (3-6 short sentences, one paragraph).
+Give an overall summary of the full conversation in simple, clear English.
+   Keep it short and clear: 1–2 paragraphs explaining the main points clearly.
+
 
 Return STRICT JSON only with exactly these keys:
 summary, sentiment, intent_score, visit_intent, parent_concerns,

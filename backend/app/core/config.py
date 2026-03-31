@@ -18,7 +18,10 @@ class Settings(BaseSettings):
     google_redirect_uri: str = "http://localhost:8000/api/google/callback"
     transcript_filename_keyword: str = "transcript"
     transcript_min_chars: int = 30
-    ingest_default_limit: int = 25
+    ingest_default_limit: int = 100
+    
+    auto_ingest_enabled: bool = True
+    auto_ingest_interval_seconds: int = 300
 
     openai_api_key: str = ""
     openai_model: str = "gpt-4.1-mini"

@@ -8,7 +8,10 @@ from app.core.config import settings
 from app.db.base import Base
 from app.db.schema_sync import ensure_sentiment_summary_column
 from app.db.session import engine
+from app.services.auto_ingest_service import start_auto_ingest_thread
+import logging
 
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(title="Call Records Sentiment API", version="0.1.0")
 
@@ -20,11 +23,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 @app.on_event("startup")
 def on_startup() -> None:
     Base.metadata.create_all(bind=engine)
     ensure_sentiment_summary_column(engine)
+    start_auto_ingest_thread()
 
 
 @app.get("/health")

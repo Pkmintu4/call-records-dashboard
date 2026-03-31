@@ -84,32 +84,41 @@ def list_txt_files(access_token: str, folder_id: str | None = None) -> list[Driv
 
     params = {
         "q": query,
-        "fields": "files(id,name,modifiedTime,size)",
+        "fields": "nextPageToken, files(id,name,modifiedTime,size)",
         "pageSize": 1000,
+        "orderBy": "modifiedTime desc",
         "supportsAllDrives": "true",
         "includeItemsFromAllDrives": "true",
     }
     headers = {"Authorization": f"Bearer {access_token}"}
 
-    with httpx.Client(timeout=30) as client:
-        response = client.get(f"{DRIVE_API_BASE}/files", params=params, headers=headers)
-        response.raise_for_status()
-        payload = response.json()
-
     files: list[DriveFile] = []
-    for item in payload.get("files", []):
-        modified_raw = item.get("modifiedTime")
-        modified_time = isoparse(modified_raw) if modified_raw else None
-        size_raw = item.get("size")
-        size_bytes = int(size_raw) if size_raw is not None else None
-        files.append(
-            DriveFile(
-                file_id=item["id"],
-                name=item["name"],
-                modified_time=modified_time,
-                size_bytes=size_bytes,
-            )
-        )
+    
+    with httpx.Client(timeout=30) as client:
+        while True:
+            response = client.get(f"{DRIVE_API_BASE}/files", params=params, headers=headers)
+            response.raise_for_status()
+            payload = response.json()
+
+            for item in payload.get("files", []):
+                modified_raw = item.get("modifiedTime")
+                modified_time = isoparse(modified_raw) if modified_raw else None
+                size_raw = item.get("size")
+                size_bytes = int(size_raw) if size_raw is not None else None
+                files.append(
+                    DriveFile(
+                        file_id=item["id"],
+                        name=item["name"],
+                        modified_time=modified_time,
+                        size_bytes=size_bytes,
+                    )
+                )
+                
+            next_page_token = payload.get("nextPageToken")
+            if not next_page_token:
+                break
+            params["pageToken"] = next_page_token
+
     return files
 
 

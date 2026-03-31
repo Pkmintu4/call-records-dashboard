@@ -55,7 +55,14 @@ body {
 
 .kpi-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.kpi-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-bottom: 16px;
 }
@@ -65,6 +72,63 @@ body {
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.kpi-card {
+  padding: 14px 16px;
+}
+
+.kpi-label {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kpi-value {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.kpi-value.small {
+  font-size: 1.05rem;
+  line-height: 1.25rem;
+}
+
+.pie-legend-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.pie-legend-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.pie-legend-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pie-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.pie-legend-value {
+  color: #4b5563;
+  font-variant-numeric: tabular-nums;
 }
 
 .card h3 {
@@ -146,6 +210,10 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .kpi-cards-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .kpi-grid {
     grid-template-columns: 1fr;
   }
@@ -153,5 +221,11 @@ body {
   .header {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+@media (max-width: 620px) {
+  .kpi-cards-grid {
+    grid-template-columns: 1fr;
   }
 }

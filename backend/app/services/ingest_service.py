@@ -48,6 +48,10 @@ def run_ingest(
             skipped += 1
             continue
 
+        if drive_file.size_bytes is not None and drive_file.size_bytes < settings.transcript_min_chars:
+            skipped_too_short += 1
+            continue
+
         content = download_text_file(access_token, drive_file.file_id)
         normalized_content = content.strip()
         if not normalized_content:
