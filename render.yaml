@@ -2,6 +2,7 @@ services:
   - type: web
     name: call-records-dashboard
     runtime: docker
+    plan: free
     dockerContext: .
     dockerfilePath: ./backend/Dockerfile
     healthCheckPath: /health
@@ -10,9 +11,7 @@ services:
       - key: APP_ENV
         value: prod
       - key: DATABASE_URL
-        fromDatabase:
-          name: call-records-db
-          property: connectionString
+        sync: false
       - key: OPENAI_MODEL
         value: gpt-4.1-mini
       - key: AUTO_INGEST_ENABLED
@@ -31,8 +30,3 @@ services:
         sync: false
       - key: OPENAI_API_KEY
         sync: false
-
-databases:
-  - name: call-records-db
-    databaseName: call_records
-    user: call_records_user

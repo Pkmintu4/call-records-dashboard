@@ -126,19 +126,21 @@ If `limit` is omitted, backend uses `INGEST_DEFAULT_LIMIT` from `.env` (default 
 - `GET /api/dashboard/calls`
 - `GET /api/dashboard/calls/{transcript_id}`
 
-## 7) Cloud deploy (Render)
+## 7) Free cloud deploy (Render + free Postgres)
 
-This repo includes `render.yaml` for one-service cloud deployment where FastAPI serves both API and the built React app.
+This repo includes `render.yaml` for a free one-service deploy where FastAPI serves both API and the built React app.
+
+Use any free Postgres provider (Neon or Supabase) and paste its connection string into Render.
 
 ### Steps
 
-1. Push your latest changes to GitHub.
-2. In Render, choose **New +** -> **Blueprint**.
-3. Select your GitHub repository.
-4. Render reads `render.yaml` and creates:
-    - one web service (`call-records-dashboard`)
-    - one Postgres database (`call-records-db`)
-5. Set secret environment variables in Render service settings:
+1. Create a free Postgres database in Neon or Supabase.
+2. Copy its connection string.
+3. Push your latest changes to GitHub.
+4. In Render, choose **New +** -> **Blueprint** and select your repo.
+5. Render reads `render.yaml` and creates one free web service.
+6. In Render service settings, set environment variables:
+    - `DATABASE_URL` (from Neon/Supabase)
     - `GOOGLE_CLIENT_ID`
     - `GOOGLE_CLIENT_SECRET`
     - `GOOGLE_REFRESH_TOKEN`
@@ -147,11 +149,11 @@ This repo includes `render.yaml` for one-service cloud deployment where FastAPI 
     - `OPENAI_API_KEY`
     - `CORS_ORIGINS`
 
-### Important values for Render
+### Important values
 
-- Set `GOOGLE_REDIRECT_URI` to:
+- `GOOGLE_REDIRECT_URI`
    - `https://<your-render-service-domain>/api/google/callback`
-- Set `CORS_ORIGINS` to JSON array, e.g.:
+- `CORS_ORIGINS` (JSON array)
    - `["https://<your-render-service-domain>"]`
 
-After deploy, open `https://<your-render-service-domain>/health` and then the root URL to access the dashboard.
+After deploy, open `https://<your-render-service-domain>/health` and then the root URL.
