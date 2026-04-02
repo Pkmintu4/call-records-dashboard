@@ -125,3 +125,33 @@ If `limit` is omitted, backend uses `INGEST_DEFAULT_LIMIT` from `.env` (default 
 - `GET /api/dashboard/distribution`
 - `GET /api/dashboard/calls`
 - `GET /api/dashboard/calls/{transcript_id}`
+
+## 7) Cloud deploy (Render)
+
+This repo includes `render.yaml` for one-service cloud deployment where FastAPI serves both API and the built React app.
+
+### Steps
+
+1. Push your latest changes to GitHub.
+2. In Render, choose **New +** -> **Blueprint**.
+3. Select your GitHub repository.
+4. Render reads `render.yaml` and creates:
+    - one web service (`call-records-dashboard`)
+    - one Postgres database (`call-records-db`)
+5. Set secret environment variables in Render service settings:
+    - `GOOGLE_CLIENT_ID`
+    - `GOOGLE_CLIENT_SECRET`
+    - `GOOGLE_REFRESH_TOKEN`
+    - `GOOGLE_DRIVE_FOLDER_ID`
+    - `GOOGLE_REDIRECT_URI`
+    - `OPENAI_API_KEY`
+    - `CORS_ORIGINS`
+
+### Important values for Render
+
+- Set `GOOGLE_REDIRECT_URI` to:
+   - `https://<your-render-service-domain>/api/google/callback`
+- Set `CORS_ORIGINS` to JSON array, e.g.:
+   - `["https://<your-render-service-domain>"]`
+
+After deploy, open `https://<your-render-service-domain>/health` and then the root URL to access the dashboard.

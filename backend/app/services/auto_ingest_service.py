@@ -7,6 +7,11 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
+
+def _is_invalid_grant_error(error: Exception) -> bool:
+    message = str(error).lower()
+    return "invalid_grant" in message or "expired or revoked" in message
+
 def _auto_ingest_loop():
     logger.info("Auto-ingest background task started.")
     time.sleep(5)  # Wait briefly exactly once at the beginning
@@ -26,6 +31,12 @@ def _auto_ingest_loop():
             time.sleep(settings.auto_ingest_interval_seconds)
             
         except Exception as e:
+            if _is_invalid_grant_error(e):
+                logger.error(
+                    "Auto-ingest stopped: Google refresh token is invalid or revoked. "
+                    "Update GOOGLE_REFRESH_TOKEN and restart backend."
+                )
+                break
             logger.error(f"Auto-ingest encountered an error: {e}")
             time.sleep(settings.auto_ingest_interval_seconds)
 

@@ -13,3 +13,7 @@ frontend/.env
 
 *.db
 *.db-journal
+
+*.egg-info/
+build/
+dist/

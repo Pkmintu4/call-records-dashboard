@@ -1,5 +1,8 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.routes_dashboard import router as dashboard_router
 from app.api.routes_google_auth import router as google_auth_router
@@ -38,3 +41,7 @@ def health() -> dict[str, str]:
 app.include_router(ingest_router, prefix="/api/ingest", tags=["ingest"])
 app.include_router(dashboard_router, prefix="/api/dashboard", tags=["dashboard"])
 app.include_router(google_auth_router, prefix="/api/google", tags=["google-auth"])
+
+frontend_dist = Path(__file__).resolve().parent / "static"
+if frontend_dist.exists():
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")

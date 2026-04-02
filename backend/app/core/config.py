@@ -26,6 +26,18 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     openai_model: str = "gpt-4.1-mini"
 
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def normalize_database_url(cls, value: object) -> str:
+        raw = str(value or "").strip()
+        if not raw:
+            return "sqlite:///./call_records.db"
+        if raw.startswith("postgres://"):
+            return "postgresql+psycopg2://" + raw[len("postgres://") :]
+        if raw.startswith("postgresql://"):
+            return "postgresql+psycopg2://" + raw[len("postgresql://") :]
+        return raw
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def parse_cors_origins(cls, value: object) -> list[str]:

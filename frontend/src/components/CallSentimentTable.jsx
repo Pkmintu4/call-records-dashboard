@@ -1,14 +1,17 @@
 function CallSentimentTable({ rows, onSelect }) {
   return (
     <div className="card">
-      <h3>Per-Call Sentiment</h3>
+      <h3>Top 10 Per-Call Sentiment Analytics</h3>
       <table className="table">
         <thead>
           <tr>
             <th>File</th>
-            <th>Summary</th>
+            <th>Detailed Insight</th>
             <th>Label</th>
             <th>Score</th>
+            <th>Admission %</th>
+            <th>Intent</th>
+            <th>Visit</th>
             <th>Created</th>
           </tr>
         </thead>
@@ -20,15 +23,18 @@ function CallSentimentTable({ rows, onSelect }) {
                   {row.file_name}
                 </button>
               </td>
-              <td>{row.summary}</td>
+              <td>{row.detailed_insight || row.summary}</td>
               <td>{row.label}</td>
               <td>{row.score.toFixed(2)}</td>
+              <td>{row.admission_probability}%</td>
+              <td>{row.intent_score}/5</td>
+              <td>{row.visit_intent}</td>
               <td>{new Date(row.created_at).toLocaleString()}</td>
             </tr>
           ))}
           {rows.length === 0 && (
             <tr>
-              <td colSpan={5}>No records yet. Click “Fetch from Drive”.</td>
+              <td colSpan={8}>No records yet. Click “Fetch from Drive”.</td>
             </tr>
           )}
         </tbody>

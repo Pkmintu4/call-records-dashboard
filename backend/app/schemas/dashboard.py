@@ -20,6 +20,10 @@ class CallItem(BaseModel):
     score: float
     label: str
     summary: str
+    detailed_insight: str
+    admission_probability: int
+    intent_score: int
+    visit_intent: str
 
 
 class CallDetail(BaseModel):
