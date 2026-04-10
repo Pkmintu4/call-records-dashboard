@@ -13,6 +13,7 @@ class Sentiment(Base):
     transcript_id: Mapped[int] = mapped_column(ForeignKey("transcripts.id", ondelete="CASCADE"), unique=True, nullable=False)
     score: Mapped[float] = mapped_column(Float, nullable=False)
     label: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    intent_category: Mapped[str] = mapped_column(String(32), nullable=False, default="Inquiry", index=True)
     summary: Mapped[str] = mapped_column(Text, nullable=False, default="")
     kpi_json: Mapped[str] = mapped_column(Text, nullable=False, default="{}")
     explanation: Mapped[str] = mapped_column(Text, nullable=False)

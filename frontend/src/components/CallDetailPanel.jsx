@@ -1,3 +1,6 @@
+import { getCallAudioUrl } from "../lib/api";
+
+
 function CallDetailPanel({ detail }) {
   if (!detail) {
     return (
@@ -12,6 +15,8 @@ function CallDetailPanel({ detail }) {
       </div>
     );
   }
+
+  const hasAudioFile = /\.(mp3|wav|m4a|flac|ogg|aac|amr)$/i.test(String(detail.file_name || ""));
 
   return (
     <div className="card chart-card">
@@ -30,6 +35,10 @@ function CallDetailPanel({ detail }) {
           <div className="detail-item">
             <span className="detail-label">Sentiment Score</span>
             <p className="detail-value">{detail.score.toFixed(2)}</p>
+          </div>
+          <div className="detail-item">
+            <span className="detail-label">Intent Category</span>
+            <p className="detail-value">{detail.intent_category || "Inquiry"}</p>
           </div>
           <div className="detail-item">
             <span className="detail-label">Summary</span>
@@ -133,6 +142,16 @@ function CallDetailPanel({ detail }) {
       <div className="detail-divider"></div>
       <div className="detail-section">
         <h4 className="section-title">Transcript</h4>
+        {hasAudioFile && (
+          <audio
+            controls
+            preload="none"
+            className="inline-audio-player"
+            src={getCallAudioUrl(detail.transcript_id)}
+          >
+            Your browser does not support audio playback.
+          </audio>
+        )}
         <div className="content-block">{detail.content}</div>
       </div>
     </div>

@@ -16,6 +16,28 @@ services:
         value: gpt-4.1-mini
       - key: AUTO_INGEST_ENABLED
         value: "false"
+      - key: AUDIO_INGEST_ENABLED
+        value: "true"
+      - key: ALLOWED_TRANSCRIPT_LANGUAGES
+        value: '["en","hi","te"]'
+      - key: GOOGLE_SPEECH_LANGUAGE_CODES
+        value: '["en-US","hi-IN","te-IN"]'
+      - key: GOOGLE_SPEECH_MODEL
+        value: phone_call
+      - key: GOOGLE_SPEECH_USE_ENHANCED
+        value: "true"
+      - key: TRANSCRIPTION_PROVIDER
+        value: google_speech
+      - key: TRANSCRIPTION_TIMEOUT_SECONDS
+        value: "180"
+      - key: TRANSCRIPTION_POLL_INTERVAL_SECONDS
+        value: "2"
+      - key: TRANSCRIPTION_LONG_RUNNING_THRESHOLD_SECONDS
+        value: "55"
+      - key: TRANSCRIPTION_NORMALIZE_AUDIO
+        value: "true"
+      - key: TRANSCRIPTION_MAX_AUDIO_MB
+        value: "25"
       - key: CORS_ORIGINS
         sync: false
       - key: GOOGLE_CLIENT_ID
@@ -24,9 +46,31 @@ services:
         sync: false
       - key: GOOGLE_REFRESH_TOKEN
         sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_FILE
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_SUBJECT
+        sync: false
       - key: GOOGLE_DRIVE_FOLDER_ID
         sync: false
+      - key: DRIVE_SCAN_RECURSIVE
+        value: "true"
+      - key: DRIVE_SCAN_MAX_FOLDERS
+        value: "200"
       - key: GOOGLE_REDIRECT_URI
         sync: false
       - key: OPENAI_API_KEY
         sync: false
+      - key: GEMINI_ENABLED
+        value: "false"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-1.5-flash
+      - key: GEMINI_TIMEOUT_SECONDS
+        value: "60"
+      - key: GEMINI_TRANSCRIPTION_MODEL
+        value: gemini-1.5-flash
+      - key: GEMINI_TRANSCRIPTION_INLINE_MAX_MB
+        value: "18"

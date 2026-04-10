@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 
 from dateutil.parser import isoparse
 import httpx
@@ -8,6 +9,8 @@ from app.core.config import settings
 
 
 DRIVE_API_BASE = "https://www.googleapis.com/drive/v3"
+SUPPORTED_AUDIO_EXTENSIONS = {".mp3", ".wav", ".m4a", ".flac", ".ogg", ".amr", ".aac"}
+FOLDER_MIME_TYPE = "application/vnd.google-apps.folder"
 
 
 @dataclass
@@ -16,6 +19,7 @@ class DriveFile:
     name: str
     modified_time: datetime | None
     size_bytes: int | None
+    mime_type: str | None
 
 
 def _escape_drive_query_value(value: str) -> str:
@@ -72,19 +76,10 @@ def resolve_folder_id_from_path(access_token: str, folder_path: str) -> str:
     return parent_id
 
 
-def list_txt_files(access_token: str, folder_id: str | None = None) -> list[DriveFile]:
-    active_folder_id = folder_id or settings.google_drive_folder_id
-    if not active_folder_id:
-        raise ValueError("Missing GOOGLE_DRIVE_FOLDER_ID in environment")
-
-    transcript_keyword = settings.transcript_filename_keyword.strip()
-    query = f"'{active_folder_id}' in parents and mimeType='text/plain' and trashed=false"
-    if transcript_keyword:
-        query += f" and name contains '{transcript_keyword}'"
-
+def _list_drive_files(access_token: str, query: str) -> list[DriveFile]:
     params = {
         "q": query,
-        "fields": "nextPageToken, files(id,name,modifiedTime,size)",
+        "fields": "nextPageToken, files(id,name,mimeType,modifiedTime,size)",
         "pageSize": 1000,
         "orderBy": "modifiedTime desc",
         "supportsAllDrives": "true",
@@ -93,7 +88,7 @@ def list_txt_files(access_token: str, folder_id: str | None = None) -> list[Driv
     headers = {"Authorization": f"Bearer {access_token}"}
 
     files: list[DriveFile] = []
-    
+
     with httpx.Client(timeout=30) as client:
         while True:
             response = client.get(f"{DRIVE_API_BASE}/files", params=params, headers=headers)
@@ -111,9 +106,10 @@ def list_txt_files(access_token: str, folder_id: str | None = None) -> list[Driv
                         name=item["name"],
                         modified_time=modified_time,
                         size_bytes=size_bytes,
+                        mime_type=item.get("mimeType"),
                     )
                 )
-                
+
             next_page_token = payload.get("nextPageToken")
             if not next_page_token:
                 break
@@ -122,9 +118,63 @@ def list_txt_files(access_token: str, folder_id: str | None = None) -> list[Driv
     return files
 
 
+def list_txt_files(access_token: str, folder_id: str | None = None) -> list[DriveFile]:
+    active_folder_id = folder_id or settings.google_drive_folder_id
+    if not active_folder_id:
+        raise ValueError("Missing GOOGLE_DRIVE_FOLDER_ID in environment")
+
+    transcript_keyword = settings.transcript_filename_keyword.strip()
+    query = f"'{active_folder_id}' in parents and mimeType='text/plain' and trashed=false"
+    if transcript_keyword:
+        query += f" and name contains '{transcript_keyword}'"
+    return _list_drive_files(access_token, query)
+
+
+def list_audio_files(access_token: str, folder_id: str | None = None) -> list[DriveFile]:
+    active_folder_id = folder_id or settings.google_drive_folder_id
+    if not active_folder_id:
+        raise ValueError("Missing GOOGLE_DRIVE_FOLDER_ID in environment")
+
+    results: list[DriveFile] = []
+
+    max_folders = max(1, int(settings.drive_scan_max_folders))
+    queue: list[str] = [active_folder_id]
+    seen: set[str] = set()
+
+    while queue and len(seen) < max_folders:
+        current_folder = queue.pop(0)
+        if current_folder in seen:
+            continue
+        seen.add(current_folder)
+
+        query = f"'{current_folder}' in parents and trashed=false"
+        candidates = _list_drive_files(access_token, query)
+
+        for item in candidates:
+            mime_type = (item.mime_type or "").lower()
+            if mime_type == FOLDER_MIME_TYPE:
+                if settings.drive_scan_recursive and item.file_id not in seen:
+                    queue.append(item.file_id)
+                continue
+
+            suffix = Path(item.name).suffix.lower()
+            if suffix in SUPPORTED_AUDIO_EXTENSIONS or mime_type.startswith("audio/") or mime_type == "video/mp4":
+                results.append(item)
+
+    return results
+
+
 def download_text_file(access_token: str, file_id: str) -> str:
     headers = {"Authorization": f"Bearer {access_token}"}
     with httpx.Client(timeout=30) as client:
         response = client.get(f"{DRIVE_API_BASE}/files/{file_id}", params={"alt": "media"}, headers=headers)
         response.raise_for_status()
     return response.text
+
+
+def download_file_bytes(access_token: str, file_id: str) -> bytes:
+    headers = {"Authorization": f"Bearer {access_token}"}
+    with httpx.Client(timeout=60) as client:
+        response = client.get(f"{DRIVE_API_BASE}/files/{file_id}", params={"alt": "media"}, headers=headers)
+        response.raise_for_status()
+    return response.content

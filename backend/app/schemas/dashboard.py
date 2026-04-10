@@ -19,6 +19,7 @@ class CallItem(BaseModel):
     created_at: datetime
     score: float
     label: str
+    intent_category: str
     summary: str
     detailed_insight: str
     admission_probability: int
@@ -32,10 +33,41 @@ class CallDetail(BaseModel):
     modified_time: datetime | None
     score: float
     label: str
+    intent_category: str
     summary: str
     kpis: dict[str, object]
     explanation: str
     keywords: list[str]
+    content: str
+
+
+class GroupedCallItem(BaseModel):
+    transcript_id: int
+    file_name: str
+    created_at: datetime
+    label: str
+    score: float
+    summary: str
+
+
+class CallsByNumberItem(BaseModel):
+    phone_number: str
+    call_count: int
+    latest_call_at: datetime
+    avg_score: float
+    dominant_label: str
+    top_intent: str
+    combined_summary: str
+    calls: list[GroupedCallItem]
+
+
+class TranscriptSummaryItem(BaseModel):
+    transcript_id: int
+    file_name: str
+    created_at: datetime
+    label: str
+    intent_category: str
+    summary: str
     content: str
 
 

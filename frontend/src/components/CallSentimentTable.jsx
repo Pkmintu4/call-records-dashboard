@@ -27,7 +27,7 @@ function CallSentimentTable({ rows, onSelect }) {
               <td>{row.label}</td>
               <td>{row.score.toFixed(2)}</td>
               <td>{row.admission_probability}%</td>
-              <td>{row.intent_score}/5</td>
+              <td>{row.intent_category || "Inquiry"} ({row.intent_score}/5)</td>
               <td>{row.visit_intent}</td>
               <td>{new Date(row.created_at).toLocaleString()}</td>
             </tr>
