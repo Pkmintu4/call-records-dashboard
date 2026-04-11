@@ -124,10 +124,35 @@ def list_txt_files(access_token: str, folder_id: str | None = None) -> list[Driv
         raise ValueError("Missing GOOGLE_DRIVE_FOLDER_ID in environment")
 
     transcript_keyword = settings.transcript_filename_keyword.strip()
-    query = f"'{active_folder_id}' in parents and mimeType='text/plain' and trashed=false"
-    if transcript_keyword:
-        query += f" and name contains '{transcript_keyword}'"
-    return _list_drive_files(access_token, query)
+    escaped_keyword = _escape_drive_query_value(transcript_keyword)
+
+    results: list[DriveFile] = []
+    max_folders = max(1, int(settings.drive_scan_max_folders))
+    queue: list[str] = [active_folder_id]
+    seen: set[str] = set()
+
+    while queue and len(seen) < max_folders:
+        current_folder = queue.pop(0)
+        if current_folder in seen:
+            continue
+        seen.add(current_folder)
+
+        text_query = f"'{current_folder}' in parents and mimeType='text/plain' and trashed=false"
+        if escaped_keyword:
+            text_query += f" and name contains '{escaped_keyword}'"
+        results.extend(_list_drive_files(access_token, text_query))
+
+        if settings.drive_scan_recursive:
+            folders_query = (
+                f"'{current_folder}' in parents and "
+                f"mimeType='{FOLDER_MIME_TYPE}' and trashed=false"
+            )
+            child_folders = _list_drive_files(access_token, folders_query)
+            for child in child_folders:
+                if child.file_id not in seen:
+                    queue.append(child.file_id)
+
+    return results
 
 
 def list_audio_files(access_token: str, folder_id: str | None = None) -> list[DriveFile]:
