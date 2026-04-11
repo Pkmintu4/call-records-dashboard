@@ -24,6 +24,8 @@ services:
     container_name: call_records_backend
     env_file:
       - .env
+    volumes:
+      - ./creds.json:/app/creds.json:ro
     environment:
       DATABASE_URL: postgresql+psycopg2://postgres:postgres@postgres:5432/call_records
       CORS_ORIGINS: '["http://localhost:5173","http://127.0.0.1:5173"]'

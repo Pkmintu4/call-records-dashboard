@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=("../.env", ".env"), env_file_encoding="utf-8", extra="ignore")
 
     app_env: str = "dev"
-    database_url: str = "sqlite:///./call_records.db"
+    database_url: str = "postgresql+psycopg2://postgres:postgres@localhost:5432/call_records"
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173", "http://127.0.0.1:5173"])
 
     google_client_id: str = ""
@@ -72,7 +72,7 @@ class Settings(BaseSettings):
     def normalize_database_url(cls, value: object) -> str:
         raw = str(value or "").strip()
         if not raw:
-            return "sqlite:///./call_records.db"
+            return "postgresql+psycopg2://postgres:postgres@localhost:5432/call_records"
         if raw.startswith("postgres://"):
             return "postgresql+psycopg2://" + raw[len("postgres://") :]
         if raw.startswith("postgresql://"):
