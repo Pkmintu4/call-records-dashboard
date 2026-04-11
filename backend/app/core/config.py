@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     transcript_filename_keyword: str = "transcript"
     transcript_min_chars: int = 30
     ingest_default_limit: int = 100
+    ingest_force_audio_only: bool = True
     audio_ingest_enabled: bool = True
     allowed_transcript_languages: list[str] = Field(default_factory=lambda: ["en", "hi", "te"])
     google_speech_language_codes: list[str] = Field(default_factory=lambda: ["en-US", "hi-IN", "te-IN"])

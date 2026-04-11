@@ -25,6 +25,8 @@ def ingest_now(
     audio_only: bool = Query(default=False, description="Process only supported audio files and skip .txt transcript files"),
     db: Session = Depends(get_db),
 ) -> dict[str, object]:
+    effective_audio_only = audio_only or settings.ingest_force_audio_only
+
     if not INGEST_LOCK.acquire(blocking=False):
         raise HTTPException(
             status_code=409,
@@ -42,7 +44,7 @@ def ingest_now(
             folder_input=folder,
             max_files=limit,
             force_reprocess=force_reprocess,
-            audio_only=audio_only,
+            audio_only=effective_audio_only,
         )
         finish_ingest(result)
         return result

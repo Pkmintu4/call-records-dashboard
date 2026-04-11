@@ -28,7 +28,11 @@ def _auto_ingest_loop():
         try:
             begin_ingest(mode="auto", folder=None, limit=settings.ingest_default_limit)
             with SessionLocal() as db:
-                result = run_ingest(db, max_files=settings.ingest_default_limit)
+                result = run_ingest(
+                    db,
+                    max_files=settings.ingest_default_limit,
+                    audio_only=settings.ingest_force_audio_only,
+                )
                 finish_ingest(result)
                 
                 processed = result.get("processed", 0)
