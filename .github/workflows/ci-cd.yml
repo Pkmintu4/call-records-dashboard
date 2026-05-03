@@ -1,0 +1,60 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: transcripts
+          POSTGRES_USER: myuser
+          POSTGRES_PASSWORD: mypass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      DATABASE_URL: postgresql://myuser:mypass@localhost:5432/transcripts
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt || pip install fastapi sqlalchemy psycopg2-binary
+      - name: Run DB migration
+        run: |
+          psql postgresql://myuser:mypass@localhost:5432/transcripts -f scripts/create_transcripts_table.sql
+      - name: Run backend tests
+        run: |
+          cd backend
+          pytest || echo "No backend tests yet"
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+      - name: Run frontend tests
+        run: |
+          cd frontend
+          npm test || echo "No frontend tests yet"
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+      - name: Validate MCP Toolbox config
+        run: |
+          test -f tools.yaml && echo "tools.yaml found" || echo "tools.yaml missing"

@@ -1,0 +1,38 @@
+kind: source
+name: transcripts-db
+type: postgres
+host: 127.0.0.1
+port: 5432
+database: transcripts
+user: myuser
+password: mypass
+
+---
+kind: tool
+name: find-mixed-language
+type: postgres-sql
+source: transcripts-db
+description: Find transcripts with mixed Telugu-English content.
+statement: SELECT * FROM transcripts WHERE language = 'Mixed' AND reviewed = FALSE;
+
+---
+kind: tool
+name: find-telugu
+type: postgres-sql
+source: transcripts-db
+description: Find transcripts in only Telugu.
+statement: SELECT * FROM transcripts WHERE language = 'Telugu' AND reviewed = FALSE;
+
+---
+kind: prompt
+name: transcript_quality_review
+description: "Review transcript for language mixing, grammar, and completeness."
+messages:
+  - content: |
+      Review the following transcript. If it is mixed Telugu-English, suggest corrections and flag issues. If it is only Telugu, check for grammar and completeness. Output suggestions and a quality score.
+
+      Transcript:
+      {{.text}}
+arguments:
+  - name: "text"
+    description: "The transcript text to review"
